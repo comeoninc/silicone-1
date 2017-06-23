@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es2015",
+    "diagnostics": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "sourceMap": false,
+    "declaration": true,
+    "declarationDir": "./build/typings",
+    "outDir": "./build/src",
+    "moduleResolution": "node",
+    "stripInternal": true,
+    "pretty": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "dnd": [
+        "src/dnd"
+      ],
+      "common": [
+        "src/common"
+      ]
+    },
+    "lib": [
+      "dom",
+      "es5",
+      "es2017"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "test",
+    "build"
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}
