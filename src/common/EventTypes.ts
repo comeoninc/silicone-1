@@ -44,7 +44,9 @@ export default {
     'mouseup',
     'mouseover',
     'mousemove',
-    'mouseout'
+    'mouseout',
+    'mouseenter',
+    'mouseleave'
   ],
   MutationEvent: [],
   OfflineAudioCompletionEvent: [],

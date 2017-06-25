@@ -10,10 +10,6 @@ export interface IEventParams {
   callback: (event: Event) => Event
 };
 
-export interface ICustomDragEvent extends DragEvent {
-  dataTransfer: DataTransfer;
-}
-
 export interface IEventCategory {
   [type: string]: Array<string>;
 }
@@ -28,6 +24,8 @@ export type DecorableEventFunction = (targetElement: Element, eventProperties: a
 export type EventInterface = 'AnimationEvent' | 'AudioProcessingEvent' | 'BeforeInputEvent' | 'BeforeUnloadEvent' | 'BlobEvent' | 'ClipboardEvent' | 'CloseEvent' | 'CompositionEvent' | 'CSSFontFaceLoadEvent' | 'CustomEvent' | 'DeviceLightEvent' | 'DeviceMotionEvent' | 'DeviceOrientationEvent' | 'DeviceProximityEvent' | 'DOMTransactionEvent' | 'DragEvent' | 'EditingBeforeInputEvent' | 'ErrorEvent' | 'FetchEvent' | 'FocusEvent' | 'GamepadEvent' | 'HashChangeEvent' | 'IDBVersionChangeEvent' | 'InputEvent' | 'KeyboardEvent' | 'MediaStreamEvent' | 'MessageEvent' | 'MouseEvent' | 'MutationEvent' | 'OfflineAudioCompletionEvent' | 'PageTransitionEvent' | 'PointerEvent' | 'PopStateEvent' | 'ProgressEvent' | 'RelatedEvent' | 'RTCDataChannelEvent' | 'RTCIdentityErrorEvent' | 'RTCIdentityEvent' | 'RTCPeerConnectionIceEvent' | 'SensorEvent' | 'StorageEvent' | 'SVGEvent' | 'SVGZoomEvent' | 'TimeEvent' | 'TouchEvent' | 'TrackEvent' | 'TransitionEvent' | 'UIEvent' | 'UserProximityEvent' | 'WebGLContextEvent' | 'WheelEvent';
 
 namespace Event {
+
+  export const defaultDragEventOptions = { view: window, bubbles: true, cancelable: true };
 
   /**
    * Creates a new event
@@ -106,11 +104,19 @@ namespace Event {
 
   export function createAndDispatch(target: Element, eventType: string, eventProperties, decorator?: EventDecorator): Event {
     let event = create(eventType, eventProperties);
-    debugger;
     if (decorator) event = decorator(event);
     dispatch(target, event);
     return event;
   }
+
+  export function genericActionEvent(eventType: string, target: Element | string, options: EventInit = defaultDragEventOptions): Event {
+    if (is.string(target)) target = document.querySelector(target as string);
+    if (!Object.keys(EventTypes).some($ => EventTypes[$].includes(eventType)))
+      Error.fail(`Invalid event type ${eventType}. This is most likely a bug on our side, please report it!`, ErrorType.EXECUTION_FAILURE);
+    Event.validateArguments(target as Element, options);
+    return Event.createAndDispatch(target as Element, eventType, options);
+  }
+
 };
 
 export default Event;

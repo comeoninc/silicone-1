@@ -1,6 +1,6 @@
 {
   "name": "silicone",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Synthetic event creation library for the web",
   "main": "build/silicone.js",
   "author": "Daniel Belohlavek",
