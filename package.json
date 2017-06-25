@@ -1,25 +1,21 @@
 {
   "name": "silicone",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Synthetic event creation library for the web",
-  "main": "src/index.ts",
+  "main": "build/silicone.js",
   "author": "Daniel Belohlavek",
   "license": "MIT",
   "scripts": {
-    "start": "`yarn bin`/watch 'yarn run build' src",
-    "clear:js": "rm -rf ./build/src",
-    "clear:build": "rm -rf ./build",
-    "build:bundle": "`yarn bin`/rollup -c config/rollup.config.js",
-    "build:js": "`yarn bin`/tsc -p tsconfig.json",
-    "rewrite:declarations": "node scripts/dts-path-fixer.js",
-    "build": "yarn run clear:build && yarn run build:js && yarn run build:bundle && yarn run clear:js && yarn run rewrite:declarations"
+    "start": "`yarn bin`/webpack --watch",
+    "build": "`yarn bin`/webpack"
   },
   "devDependencies": {
-    "rollup": "^0.41.6",
-    "rollup-plugin-alias": "^1.3.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
+    "@types/is": "^0.0.17",
+    "awesome-typescript-loader": "^3.1.3",
+    "babili-webpack-plugin": "^0.1.1",
+    "is_js": "^0.9.0",
     "tslint": "^5.1.0",
     "typescript": "^2.4",
-    "watch": "^1.0.2"
+    "webpack": "^3.0.0"
   }
 }

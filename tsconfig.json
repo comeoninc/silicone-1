@@ -3,27 +3,16 @@
     "module": "es2015",
     "target": "es2015",
     "diagnostics": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "inlineSourceMap": false,
     "inlineSources": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "declaration": true,
-    "declarationDir": "./build/typings",
-    "outDir": "./build/src",
+    "declarationDir": "./dist/typings",
     "moduleResolution": "node",
     "stripInternal": true,
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "paths": {
-      "dnd": [
-        "src/dnd"
-      ],
-      "common": [
-        "src/common"
-      ]
-    },
     "lib": [
       "dom",
       "es5",
