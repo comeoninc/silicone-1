@@ -1,7 +1,11 @@
-import { EventFactory } from 'common';
+import EventTypes from './EventTypes';
+import Error, { ErrorType } from './Error';
+import Helpers from './Helpers';
+import * as _is from 'is_js';
+const is: Is = _is;
 
 export interface IEventParams {
-  targetElement: HTMLElement,
+  targetElement: Element,
   eventProperties: any,
   callback: (event: Event) => Event
 };
@@ -14,131 +18,43 @@ export interface IEventCategory {
   [type: string]: Array<string>;
 }
 
+export interface IEventActionArguments {
+  target: Element;
+  options?: { [key: string]: any };
+}
+
 export type EventDecorator = (event: Event) => Event;
-export type EventType = 'AnimationEvent' | 'AudioProcessingEvent' | 'BeforeInputEvent' | 'BeforeUnloadEvent' | 'BlobEvent' | 'ClipboardEvent' | 'CloseEvent' | 'CompositionEvent' | 'CSSFontFaceLoadEvent' | 'CustomEvent' | 'DeviceLightEvent' | 'DeviceMotionEvent' | 'DeviceOrientationEvent' | 'DeviceProximityEvent' | 'DOMTransactionEvent' | 'DragEvent' | 'EditingBeforeInputEvent' | 'ErrorEvent' | 'FetchEvent' | 'FocusEvent' | 'GamepadEvent' | 'HashChangeEvent' | 'IDBVersionChangeEvent' | 'InputEvent' | 'KeyboardEvent' | 'MediaStreamEvent' | 'MessageEvent' | 'MouseEvent' | 'MutationEvent' | 'OfflineAudioCompletionEvent' | 'PageTransitionEvent' | 'PointerEvent' | 'PopStateEvent' | 'ProgressEvent' | 'RelatedEvent' | 'RTCDataChannelEvent' | 'RTCIdentityErrorEvent' | 'RTCIdentityEvent' | 'RTCPeerConnectionIceEvent' | 'SensorEvent' | 'StorageEvent' | 'SVGEvent' | 'SVGZoomEvent' | 'TimeEvent' | 'TouchEvent' | 'TrackEvent' | 'TransitionEvent' | 'UIEvent' | 'UserProximityEvent' | 'WebGLContextEvent' | 'WheelEvent';
+export type DecorableEventFunction = (targetElement: Element, eventProperties: any) => Promise<any>;
+export type EventInterface = 'AnimationEvent' | 'AudioProcessingEvent' | 'BeforeInputEvent' | 'BeforeUnloadEvent' | 'BlobEvent' | 'ClipboardEvent' | 'CloseEvent' | 'CompositionEvent' | 'CSSFontFaceLoadEvent' | 'CustomEvent' | 'DeviceLightEvent' | 'DeviceMotionEvent' | 'DeviceOrientationEvent' | 'DeviceProximityEvent' | 'DOMTransactionEvent' | 'DragEvent' | 'EditingBeforeInputEvent' | 'ErrorEvent' | 'FetchEvent' | 'FocusEvent' | 'GamepadEvent' | 'HashChangeEvent' | 'IDBVersionChangeEvent' | 'InputEvent' | 'KeyboardEvent' | 'MediaStreamEvent' | 'MessageEvent' | 'MouseEvent' | 'MutationEvent' | 'OfflineAudioCompletionEvent' | 'PageTransitionEvent' | 'PointerEvent' | 'PopStateEvent' | 'ProgressEvent' | 'RelatedEvent' | 'RTCDataChannelEvent' | 'RTCIdentityErrorEvent' | 'RTCIdentityEvent' | 'RTCPeerConnectionIceEvent' | 'SensorEvent' | 'StorageEvent' | 'SVGEvent' | 'SVGZoomEvent' | 'TimeEvent' | 'TouchEvent' | 'TrackEvent' | 'TransitionEvent' | 'UIEvent' | 'UserProximityEvent' | 'WebGLContextEvent' | 'WheelEvent';
 
 namespace Event {
 
-  export const categories: IEventCategory = {
-    AnimationEvent: [],
-    AudioProcessingEvent: [],
-    BeforeInputEvent: [],
-    BeforeUnloadEvent: [],
-    BlobEvent: [],
-    ClipboardEvent: [],
-    CloseEvent: [],
-    CompositionEvent: [],
-    CSSFontFaceLoadEvent: [],
-    CustomEvent: [],
-    DeviceLightEvent: [],
-    DeviceMotionEvent: [],
-    DeviceOrientationEvent: [],
-    DeviceProximityEvent: [],
-    DOMTransactionEvent: [],
-    DragEvent: [],
-    EditingBeforeInputEvent: [],
-    ErrorEvent: [],
-    FetchEvent: [],
-    FocusEvent: [],
-    GamepadEvent: [],
-    HashChangeEvent: [],
-    IDBVersionChangeEvent: [],
-    InputEvent: [],
-    KeyboardEvent: [
-      'keydown',
-      'keyup',
-      'keypress'
-    ],
-    MediaStreamEvent: [],
-    MessageEvent: [],
-    MouseEvent: [
-      'click',
-      'mousedown',
-      'mouseup',
-      'mouseover',
-      'mousemove',
-      'mouseout'
-    ],
-    MutationEvent: [],
-    OfflineAudioCompletionEvent: [],
-    PageTransitionEvent: [],
-    PointerEvent: [],
-    PopStateEvent: [],
-    ProgressEvent: [],
-    RelatedEvent: [],
-    RTCDataChannelEvent: [],
-    RTCIdentityErrorEvent: [],
-    RTCIdentityEvent: [],
-    RTCPeerConnectionIceEvent: [],
-    SensorEvent: [],
-    StorageEvent: [],
-    SVGEvent: [],
-    SVGZoomEvent: [],
-    TimeEvent: [],
-    TouchEvent: [],
-    TrackEvent: [],
-    TransitionEvent: [],
-    UIEvent: [],
-    UserProximityEvent: [],
-    WebGLContextEvent: [],
-    WheelEvent: [],
-  }
-
-  /**
-   * Validates arguments a returns it's equivalent event parameters object.
-   * @param targetElement A reference to a DOM element
-   * @param eventProperties A dictionary containing properties
-   * @param callback The event callback
-   */
-  export function parseParams(targetElement, eventProperties = {}, callback: (event: Event) => Event): IEventParams {
-    if (typeof eventProperties === 'function') {
-      callback = eventProperties;
-      eventProperties = null;
-    }
-
-    if (!targetElement || typeof targetElement !== 'object') {
-      throw new Error('Expected first parameter to be a targetElement. Instead got: ' + targetElement);
-    }
-
-    return { targetElement, eventProperties, callback };
-  }
-
-
-  /**
-   * Creates an event and dispatches it to the specified target element
-   * @param targetElement A reference to a DOM element
-   * @param eventName A string representing the name of the event
-   * @param eventProperties A dictionary of properties that will overwrite any default values
-   * @param decorateEvent An event modifier that will mutate the event before execution
-   */
-  export function createAndDispatchEvents(targetElement: HTMLElement, eventName: string, eventProperties, decorateEvent: (event: Event) => Event) {
-    const event = EventFactory.createEvent(eventName, eventProperties);
-    targetElement.dispatchEvent(decorateEvent(event));
-  }
-
   /**
    * Creates a new event
+   * @private
    * @param eventName A string representing the name of the event
    * @param eventType See "Interfaces based on Event" at https://developer.mozilla.org/en/docs/Web/API/Event
    * @param eventProperties A dictionary of properties that will overwrite any default values
    */
-  export function createModernEvent(eventName: string, eventType: EventType, eventProperties = {}): Event {
-    if (eventType === 'DragEvent') { eventType = 'CustomEvent'; }  // Firefox fix (since FF does not allow us to override dataTransfer)
+  function createModernEvent(eventType: string, eventInterface: EventInterface, eventProperties = {}): Event {
+    // Firefox fix (since FF does not allow us to override dataTransfer)
+    if (eventInterface === 'DragEvent') eventInterface = 'CustomEvent';
 
-    const constructor = window[eventType];
+    const constructor = window[eventInterface];
     const options = { view: window, bubbles: true, cancelable: true };
-    const event: Event = new constructor(eventName, { ...options, ...eventProperties });
+    const event: Event = new constructor(eventType, { ...options, ...eventProperties });
 
-    return { ...event, ...eventProperties };
+    return event;
   }
 
   /**
-   * Creates a new event the legacy way (document.createEvent)
+   * Creates a new event, the legacy way (document.createEvent)
+   * @private
    * @param eventName A string representing the name of the event
    * @param eventType See "Interfaces based on Event" at https://developer.mozilla.org/en/docs/Web/API/Event
    * @param eventProperties A dictionary of properties that will overwrite any default values
    */
-  export function createLegacyEvent(eventName: string, eventType: EventType, eventProperties = {}): Event {
+  function createLegacyEvent(eventName: string, eventType: EventInterface, eventProperties = {}): Event {
     let event;
 
     switch (eventType) {
@@ -152,31 +68,49 @@ namespace Event {
         event.initCustomEvent(eventName, true, true, 0);
     }
 
-    return { ...event, ...eventProperties };
+    return event;
   }
 
   /**
-   * Returns the type of the provided event name
+   * Returns the interface of the provided event name
+   * @private
    * @param name A string representing the name of the event
    */
-  export function getTypeOfEventName(name: string): EventType {
-    return Object.keys(categories).find($ => categories[$].includes(name)) as EventType;
+  function getInterfaceByEventType(name: string): EventInterface {
+    return Object.keys(EventTypes).find($ => EventTypes[$].includes(name)) as EventInterface;
   }
 
-  /**
-   * Creates an event
-   * @param eventName A string representing the name of the event
-   * @param eventType See "Interfaces based on Event" at https://developer.mozilla.org/en/docs/Web/API/Event
-   * @param eventProperties A dictionary of properties that will overwrite any default values
-   */
-  export function createEvent(eventName, eventType, eventProperties): Event {
+  export function validateArguments(target: Element, options: any) {
+    if (is.not.domNode(target))
+      return Error.fail(`Expected 'target' argument to be a DOM element, instead got ${Helpers.getConstructName(target)}`, ErrorType.INVALID_ARGUMENT);
+    if (is.not.json(options))
+      return Error.fail(`Expected 'options' argument to be an object containing event properties, instead got ${Helpers.getConstructName(options)}`, ErrorType.INVALID_ARGUMENT);
+  }
+
+  export function create(eventType: string, eventProperties: { [key: string]: any }): Event {
+    const eventInterface = getInterfaceByEventType(eventType);
     try {
-      return createModernEvent(eventName, eventType, eventProperties);
+      return createModernEvent(eventType, eventInterface, eventProperties);
     } catch (error) {
-      return createLegacyEvent(eventName, eventType, eventProperties);
+      return createLegacyEvent(eventType, eventInterface, eventProperties);
     }
   }
 
+  export function dispatch(target: Element, event: Event) {
+    const result = target.dispatchEvent(event);
+    if (result === false) {
+      const eventInterface = getInterfaceByEventType(event.type);
+      Error.fail(`Failed to dispatch '${event.type}' (${eventInterface}) on <${target.tagName.toLowerCase()}> element`, ErrorType.EXECUTION_FAILURE);
+    }
+  }
+
+  export function createAndDispatch(target: Element, eventType: string, eventProperties, decorator?: EventDecorator): Event {
+    let event = create(eventType, eventProperties);
+    debugger;
+    if (decorator) event = decorator(event);
+    dispatch(target, event);
+    return event;
+  }
 };
 
 export default Event;
