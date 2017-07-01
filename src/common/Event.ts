@@ -1,14 +1,10 @@
-import EventTypes from './EventTypes';
-import Error, { ErrorType } from './Error';
-import Helpers from './Helpers';
-import * as _is from 'is_js';
-const is: Is = _is;
+import * as Silicone from '../';
 
 export interface IEventParams {
-  targetElement: Element,
-  eventProperties: any,
-  callback: (event: Event) => Event
-};
+  targetElement: Element;
+  eventProperties: any;
+  callback: (event: Event) => Event;
+}
 
 export interface IEventCategory {
   [type: string]: Array<string>;
@@ -19,13 +15,68 @@ export interface IEventActionArguments {
   options?: { [key: string]: any };
 }
 
+export type EventTarget = Element | string;
 export type EventDecorator = (event: Event) => Event;
 export type DecorableEventFunction = (targetElement: Element, eventProperties: any) => Promise<any>;
-export type EventInterface = 'AnimationEvent' | 'AudioProcessingEvent' | 'BeforeInputEvent' | 'BeforeUnloadEvent' | 'BlobEvent' | 'ClipboardEvent' | 'CloseEvent' | 'CompositionEvent' | 'CSSFontFaceLoadEvent' | 'CustomEvent' | 'DeviceLightEvent' | 'DeviceMotionEvent' | 'DeviceOrientationEvent' | 'DeviceProximityEvent' | 'DOMTransactionEvent' | 'DragEvent' | 'EditingBeforeInputEvent' | 'ErrorEvent' | 'FetchEvent' | 'FocusEvent' | 'GamepadEvent' | 'HashChangeEvent' | 'IDBVersionChangeEvent' | 'InputEvent' | 'KeyboardEvent' | 'MediaStreamEvent' | 'MessageEvent' | 'MouseEvent' | 'MutationEvent' | 'OfflineAudioCompletionEvent' | 'PageTransitionEvent' | 'PointerEvent' | 'PopStateEvent' | 'ProgressEvent' | 'RelatedEvent' | 'RTCDataChannelEvent' | 'RTCIdentityErrorEvent' | 'RTCIdentityEvent' | 'RTCPeerConnectionIceEvent' | 'SensorEvent' | 'StorageEvent' | 'SVGEvent' | 'SVGZoomEvent' | 'TimeEvent' | 'TouchEvent' | 'TrackEvent' | 'TransitionEvent' | 'UIEvent' | 'UserProximityEvent' | 'WebGLContextEvent' | 'WheelEvent';
+export type EventInterface =
+  | 'AnimationEvent'
+  | 'AudioProcessingEvent'
+  | 'BeforeInputEvent'
+  | 'BeforeUnloadEvent'
+  | 'BlobEvent'
+  | 'ClipboardEvent'
+  | 'CloseEvent'
+  | 'CompositionEvent'
+  | 'CSSFontFaceLoadEvent'
+  | 'CustomEvent'
+  | 'DeviceLightEvent'
+  | 'DeviceMotionEvent'
+  | 'DeviceOrientationEvent'
+  | 'DeviceProximityEvent'
+  | 'DOMTransactionEvent'
+  | 'DragEvent'
+  | 'EditingBeforeInputEvent'
+  | 'ErrorEvent'
+  | 'FetchEvent'
+  | 'FocusEvent'
+  | 'GamepadEvent'
+  | 'HashChangeEvent'
+  | 'IDBVersionChangeEvent'
+  | 'InputEvent'
+  | 'KeyboardEvent'
+  | 'MediaStreamEvent'
+  | 'MessageEvent'
+  | 'MouseEvent'
+  | 'MutationEvent'
+  | 'OfflineAudioCompletionEvent'
+  | 'PageTransitionEvent'
+  | 'PointerEvent'
+  | 'PopStateEvent'
+  | 'ProgressEvent'
+  | 'RelatedEvent'
+  | 'RTCDataChannelEvent'
+  | 'RTCIdentityErrorEvent'
+  | 'RTCIdentityEvent'
+  | 'RTCPeerConnectionIceEvent'
+  | 'SensorEvent'
+  | 'StorageEvent'
+  | 'SVGEvent'
+  | 'SVGZoomEvent'
+  | 'TimeEvent'
+  | 'TouchEvent'
+  | 'TrackEvent'
+  | 'TransitionEvent'
+  | 'UIEvent'
+  | 'UserProximityEvent'
+  | 'WebGLContextEvent'
+  | 'WheelEvent';
 
 namespace Event {
-
-  export const defaultDragEventOptions = { view: window, bubbles: true, cancelable: true };
+  export const defaultEventOptions = {
+    view: window,
+    bubbles: true,
+    cancelable: true
+  };
 
   /**
    * Creates a new event
@@ -40,7 +91,10 @@ namespace Event {
 
     const constructor = window[eventInterface];
     const options = { view: window, bubbles: true, cancelable: true };
-    const event: Event = new constructor(eventType, { ...options, ...eventProperties });
+    const event: Event = new constructor(eventType, {
+      ...options,
+      ...eventProperties
+    });
 
     return event;
   }
@@ -75,14 +129,22 @@ namespace Event {
    * @param name A string representing the name of the event
    */
   function getInterfaceByEventType(name: string): EventInterface {
-    return Object.keys(EventTypes).find($ => EventTypes[$].includes(name)) as EventInterface;
+    return Object.keys(Silicone.EventTypes).find($ => Silicone.EventTypes[$].includes(name)) as EventInterface;
   }
 
   export function validateArguments(target: Element, options: any) {
-    if (is.not.domNode(target))
-      return Error.fail(`Expected 'target' argument to be a DOM element, instead got ${Helpers.getConstructName(target)}`, ErrorType.INVALID_ARGUMENT);
-    if (is.not.json(options))
-      return Error.fail(`Expected 'options' argument to be an object containing event properties, instead got ${Helpers.getConstructName(options)}`, ErrorType.INVALID_ARGUMENT);
+    if (!Silicone.Helpers.is.domNode(target))
+      return Silicone.Error.fail(
+        `Expected 'target' argument to be a DOM element, instead got ${Silicone.Helpers.getConstructName(target)}`,
+        Silicone.ErrorType.INVALID_ARGUMENT
+      );
+    if (!Silicone.Helpers.is.dictionary(options))
+      return Silicone.Error.fail(
+        `Expected 'options' argument to be an object containing event properties, instead got ${Silicone.Helpers.getConstructName(
+          options
+        )}`,
+        Silicone.ErrorType.INVALID_ARGUMENT
+      );
   }
 
   export function create(eventType: string, eventProperties: { [key: string]: any }): Event {
@@ -98,25 +160,39 @@ namespace Event {
     const result = target.dispatchEvent(event);
     if (result === false) {
       const eventInterface = getInterfaceByEventType(event.type);
-      Error.fail(`Failed to dispatch '${event.type}' (${eventInterface}) on <${target.tagName.toLowerCase()}> element`, ErrorType.EXECUTION_FAILURE);
+      Silicone.Error.fail(
+        `Failed to dispatch '${event.type}' (${eventInterface}) on <${target.tagName.toLowerCase()}> element`,
+        Silicone.ErrorType.EXECUTION_FAILURE
+      );
     }
   }
 
-  export function createAndDispatch(target: Element, eventType: string, eventProperties, decorator?: EventDecorator): Event {
+  export function createAndDispatch(
+    target: Element,
+    eventType: string,
+    eventProperties,
+    decorator?: EventDecorator
+  ): Event {
     let event = create(eventType, eventProperties);
     if (decorator) event = decorator(event);
     dispatch(target, event);
     return event;
   }
 
-  export function genericActionEvent(eventType: string, target: Element | string, options: EventInit = defaultDragEventOptions): Event {
-    if (is.string(target)) target = document.querySelector(target as string);
-    if (!Object.keys(EventTypes).some($ => EventTypes[$].includes(eventType)))
-      Error.fail(`Invalid event type ${eventType}. This is most likely a bug on our side, please report it!`, ErrorType.EXECUTION_FAILURE);
-    Event.validateArguments(target as Element, options);
-    return Event.createAndDispatch(target as Element, eventType, options);
+  export function genericActionEvent(
+    eventType: string,
+    target: Element | string,
+    options: EventInit = defaultEventOptions
+  ): Event {
+    if (Silicone.Helpers.is.string(target)) target = document.querySelector(target as string);
+    if (!Object.keys(Silicone.EventTypes).some($ => Silicone.EventTypes[$].includes(eventType)))
+      Silicone.Error.fail(
+        `Invalid event type '${eventType}'. This is most likely a bug on our side, please report it!`,
+        Silicone.ErrorType.EXECUTION_FAILURE
+      );
+    Silicone.Event.validateArguments(target as Element, options);
+    return Silicone.Event.createAndDispatch(target as Element, eventType, options);
   }
-
-};
+}
 
 export default Event;

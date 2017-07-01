@@ -1,5 +1,4 @@
 class DataTransferModel {
-
   dataByFormat = {};
   dropEffect = 'none';
   effectAllowed = 'all';
@@ -15,11 +14,11 @@ class DataTransferModel {
       this.dataByFormat = {};
       this.types = [];
     }
-  };
+  }
 
   getData(element) {
     return this.dataByFormat[element];
-  };
+  }
 
   setData(element, data) {
     this.dataByFormat[element] = data;
@@ -29,12 +28,11 @@ class DataTransferModel {
     }
 
     return true;
-  };
+  }
 
   setDragImage() {
     // don't do anything (the stub just makes sure there is no error thrown if someone tries to call the method)
-  };
-
+  }
 }
 
 export default DataTransferModel;

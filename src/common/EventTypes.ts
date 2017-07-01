@@ -14,15 +14,7 @@ export default {
   DeviceOrientationEvent: [],
   DeviceProximityEvent: [],
   DOMTransactionEvent: [],
-  DragEvent: [
-    'drag',
-    'dragstart',
-    'dragenter',
-    'dragover',
-    'dragend',
-    'drop',
-    'dragleave'
-  ],
+  DragEvent: ['drag', 'dragstart', 'dragenter', 'dragover', 'dragend', 'drop', 'dragleave'],
   EditingBeforeInputEvent: [],
   ErrorEvent: [],
   FetchEvent: [],
@@ -30,24 +22,11 @@ export default {
   GamepadEvent: [],
   HashChangeEvent: [],
   IDBVersionChangeEvent: [],
-  InputEvent: [],
-  KeyboardEvent: [
-    'keydown',
-    'keyup',
-    'keypress'
-  ],
+  InputEvent: ['input'],
+  KeyboardEvent: ['keydown', 'keyup', 'keypress'],
   MediaStreamEvent: [],
   MessageEvent: [],
-  MouseEvent: [
-    'click',
-    'mousedown',
-    'mouseup',
-    'mouseover',
-    'mousemove',
-    'mouseout',
-    'mouseenter',
-    'mouseleave'
-  ],
+  MouseEvent: ['click', 'mousedown', 'mouseup', 'mouseover', 'mousemove', 'mouseout', 'mouseenter', 'mouseleave'],
   MutationEvent: [],
   OfflineAudioCompletionEvent: [],
   PageTransitionEvent: [],
@@ -70,5 +49,5 @@ export default {
   UIEvent: [],
   UserProximityEvent: [],
   WebGLContextEvent: [],
-  WheelEvent: [],
+  WheelEvent: []
 };
